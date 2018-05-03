@@ -6,7 +6,7 @@ class Neo4jGDBCreator:
     # Creates an instance of the Neo4j graph and delete all
     def __init__(self):
         # Here we have to change the location of the GraphDB, by default Graph() redirect to localhost
-        self.graph = Graph(password="mq2Fq499rL")
+        self.graph = Graph(password="pass")
 
         # -------> THIS LINE HAS TO BE REMOVED! <---------
         self.graph.delete_all()
