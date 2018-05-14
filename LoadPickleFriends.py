@@ -3,7 +3,7 @@ from os import listdir
 from os.path import isfile, join
 
 
-class LoadFriends:
+class LoadPickleFriends:
 
     def __init__(self):
         pass

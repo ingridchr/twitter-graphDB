@@ -12,22 +12,22 @@ class Neo4jGDBCreator:
         self.graph.delete_all()
 
     # Create a Neo4j Graph (user_names: list of users; friends_and_followers: dict [k: user, v: dict])
-    def create_graph(self, user_names, friends_and_followers):
+    def create_graph(self, nodes, edges, labels):
         # Begin a transaction
         tx = self.graph.begin()
         # For each user
-        for user_name in user_names:
+        for user_name in nodes:
             # Get the node from Neo4j DB
             user_node = self.get_node_by_name(user_name)
             # If it doesn't exist
             if user_node is None:
                 # Create a new Node for the user
-                user_node = Node("User", name=user_name)
+                user_node = Node("User", name=user_name, label=labels.get(user_name))
                 self.graph.create(user_node)
             # If the user has friends and followers
-            if user_name in friends_and_followers.keys():
+            if user_name in edges.keys():
                 print 'Processing the user: ', user_name
-                user_friends = friends_and_followers[user_name]["friends"]
+                user_friends = edges[user_name]["friends"]
                 print 'Number of friends: ', len(user_friends)
 
                 # For each user friend
@@ -43,7 +43,7 @@ class Neo4jGDBCreator:
                     relationship = Relationship(user_node, "IS_FRIEND_OF", friend_node)
                     tx.create(relationship)
 
-                user_followers = friends_and_followers[user_name]["followers"]
+                user_followers = edges[user_name]["followers"]
                 print 'Number of followers: ', len(user_followers)
 
                 # For each user follower
