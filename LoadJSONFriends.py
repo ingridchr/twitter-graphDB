@@ -31,7 +31,6 @@ class LoadJSONFriends:
                 if extension == "json":
                     # Load the dict for that user (friends and followers)
                     user_data = self.get_json(join(path, file_name))[user_name]
-                    print user_data
 
                     # Create a dictonary of friends and followers
                     friends_and_followers_dic = dict()
@@ -54,10 +53,8 @@ class LoadJSONFriends:
     # Load an specific file - return a json: {"user_name"{"friends": {friends_list}, "followers":{followers_list}}
     @staticmethod
     def get_json(file_name):
-
         with open(file_name) as f:
             data = json.load(f)
-
         return data
 
 

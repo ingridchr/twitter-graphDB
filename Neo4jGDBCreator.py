@@ -40,7 +40,7 @@ class Neo4jGDBCreator:
                         friend_node = Node("User", name=user_friend)
                         self.graph.create(friend_node)
                     # Create the relationship btw the user and the friend (user -> IS_FRIEND_OF -> friend)
-                    relationship = Relationship(user_node, "IS_FRIEND_OF", friend_node)
+                    relationship = Relationship(user_node, "FOLLOWS", friend_node)
                     tx.create(relationship)
 
                 user_followers = edges[user_name]["followers"]
@@ -55,9 +55,11 @@ class Neo4jGDBCreator:
                         # Create a new Node for the user friend
                         follower_node = Node("User", name=user_follower)
                         self.graph.create(follower_node)
+
                     # Create the relationship btw the user and the friend (user -> IS_FOLLOWED_BY -> friend)
-                    relationship = Relationship(user_node, "IS_FOLLOWED_BY", follower_node)
+                    relationship = Relationship(follower_node, "FOLLOWS", user_node)
                     tx.create(relationship)
+
         # Commit the transaction
         tx.commit()
 
