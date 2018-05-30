@@ -4,7 +4,6 @@ from os.path import join, dirname
 
 
 class Neo4jGDBCreator:
-    i = int()
 
     # Creates an instance of the Neo4j graph and delete all
     def __init__(self):
@@ -13,12 +12,11 @@ class Neo4jGDBCreator:
         # Here we have to change the location of the GraphDB. By default Graph() redirect to localhost
         self.graph = Graph(password=config.get("configuration", "neo4J_pass"))
 
-        # -------> THIS LINE HAS TO BE REMOVED! <---------
-        self.graph.delete_all()
+        # -------> THIS LINE HAS TO BE REMOVED IF A NEO4JDB HAS ALREADY BEEN CREATED!! <---------
+        # self.graph.delete_all()
 
     # Create a Neo4j Graph (user_names: list of users; friends_and_followers: dict [k: user, v: dict])
     def create_graph(self, nodes, edges, labels):
-        print labels.keys()
         # Begin a transaction
         tx = self.graph.begin()
         # For each user
@@ -29,10 +27,10 @@ class Neo4jGDBCreator:
             if user_node is None:
                 # Create a new Node for the user
                 user_node = Node("Primary_User", name=user_name, label=labels.get(user_name))
-                self.i += 1
                 self.graph.create(user_node)
             # If the user has friends and followers
             if user_name in edges.keys():
+                print
                 print 'Processing the user: ', user_name
 
                 user_friends = edges[user_name]["friends"]
@@ -42,14 +40,12 @@ class Neo4jGDBCreator:
                 user_followers = edges[user_name]["followers"]
                 print 'Number of followers: ', len(user_followers)
                 self.create_relationships(tx, labels, user_followers, user_node, "left")
-        print self.i
         # Commit the transaction
         tx.commit()
 
     # Create the relationships btw user and friends/followers. direction is 'right' or 'left'
     def create_relationships(self, tx, labels, secondary_user_list, primary_user_node, direction="right"):
         # For each user friend
-        print secondary_user_list
         for secondary_user in secondary_user_list:
             # Get the node from Neo4j DB
             secondary_user_node = self.get_node_by_name(secondary_user)
@@ -58,10 +54,8 @@ class Neo4jGDBCreator:
                 # Create a new Node for the user friend
                 if secondary_user in labels.keys():
                     secondary_user_node = Node("Primary_User", name=secondary_user)
-                    self.i += 1
                 else:
                     secondary_user_node = Node("Secondary_User", name=secondary_user)
-                    self.i += 1
 
                 self.graph.create(secondary_user_node)
             if direction is "right":
