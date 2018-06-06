@@ -78,23 +78,23 @@ def __init__():
 
     # -------> THIS LINE HAS TO BE REMOVED IF A NEO4JDB HAS ALREADY BEEN CREATED! <---------
     # Create a new graph
-    # create_neo4j_graph_from_json()
+    create_neo4j_graph_from_json()
 
-    query = """
-            MATCH p = ()-[]-() 
-            RETURN p
-            """
-    # Run a cypher query
-    runner = CypherRunner.CypherRunner()
-    print
-    g = runner.run_cypher_query(query)
-
-    print
-    print 'Nodes:', g.number_of_nodes()
-    print 'Edges:', g.number_of_edges()
-
-    # Get SNA metrics from query result
-    print_sna_metrics(g)
+    # query = """
+    #         MATCH p = ()-[]-()
+    #         RETURN p
+    #         """
+    # # Run a cypher query
+    # runner = CypherRunner.CypherRunner()
+    # print
+    # g = runner.run_cypher_query(query)
+    #
+    # print
+    # print 'Nodes:', g.number_of_nodes()
+    # print 'Edges:', g.number_of_edges()
+    #
+    # # Get SNA metrics from query result
+    # print_sna_metrics(g)
 
 
 __init__()

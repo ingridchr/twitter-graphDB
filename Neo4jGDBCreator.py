@@ -5,15 +5,19 @@ from os.path import join, dirname
 
 class Neo4jGDBCreator:
 
+
     # Creates an instance of the Neo4j graph and delete all
     def __init__(self):
         config = ConfigParser.ConfigParser()
         config.read(join(dirname(__file__), "config.ini"))
         # Here we have to change the location of the GraphDB. By default Graph() redirect to localhost
-        self.graph = Graph(password=config.get("configuration", "neo4J_pass"))
+        self.graph = Graph(config.get("configuration", "neo4j_url"), user=config.get("configuration", "neo4j_user"),
+                           password=config.get("configuration", "neo4J_pass"))
+        self.secondary_users_count = 0
+        self.relationships_count = 0
 
         # -------> THIS LINE HAS TO BE REMOVED IF A NEO4JDB HAS ALREADY BEEN CREATED!! <---------
-        # self.graph.delete_all()
+        self.graph.delete_all()
 
     # Create a Neo4j Graph (user_names: list of users; friends_and_followers: dict [k: user, v: dict])
     def create_graph(self, nodes, edges, labels):
@@ -31,7 +35,7 @@ class Neo4jGDBCreator:
             # If the user has friends and followers
             if user_name in edges.keys():
                 print
-                print 'Processing the user: ', user_name
+                print 'Processing the primary user: ', user_name
 
                 user_friends = edges[user_name]["friends"]
                 print 'Number of friends: ', len(user_friends)
@@ -40,11 +44,17 @@ class Neo4jGDBCreator:
                 user_followers = edges[user_name]["followers"]
                 print 'Number of followers: ', len(user_followers)
                 self.create_relationships(tx, labels, user_followers, user_node, "left")
+        print
+        print
+        print 'Number of primary users:', len(nodes)
+        print 'Number of secondary users:', self.secondary_users_count
+        print 'Number of relationships:', self.relationships_count
+
         # Commit the transaction
         tx.commit()
 
     # Create the relationships btw user and friends/followers. direction is 'right' or 'left'
-    def create_relationships(self, tx, labels, secondary_user_list, primary_user_node, direction="right"):
+    def create_relationships(self, tx, primary_nodes_labels, secondary_user_list, primary_user_node, direction="right"):
         # For each user friend
         for secondary_user in secondary_user_list:
             # Get the node from Neo4j DB
@@ -52,10 +62,11 @@ class Neo4jGDBCreator:
             # If it doesn't exist
             if secondary_user_node is None:
                 # Create a new Node for the user friend
-                if secondary_user in labels.keys():
+                if secondary_user in primary_nodes_labels.keys():
                     secondary_user_node = Node("Primary_User", name=secondary_user)
                 else:
                     secondary_user_node = Node("Secondary_User", name=secondary_user)
+                    self.secondary_users_count += 1
 
                 self.graph.create(secondary_user_node)
             if direction is "right":
@@ -64,6 +75,7 @@ class Neo4jGDBCreator:
             else:
                 # Create the relationship btw the user and the follower (follower -> FOLLOWS -> user)
                 relationship = Relationship(secondary_user_node, "FOLLOWS", primary_user_node)
+            self.relationships_count += 1
             tx.create(relationship)
 
     # Get a Node from de Neo4j graph if it exists
