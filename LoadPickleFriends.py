@@ -4,19 +4,32 @@ from os.path import isfile, join
 
 
 class LoadPickleFriends:
+    """
+    This class loads a graph from a pickled file.
+    """
 
     def __init__(self):
         pass
 
     # Load a graph from a directory with files (one file for each user)
-    def load_graph(self, path):
+    def load_graph(self, directory):
+        """
+        Loads a graph from a pickled file (extension: .picklefriends)
+        :param directory
+        :return:
+            set
+                All the nodes
+            dict
+                All the edges
+                (A dict of dict --> ["user_name_1", ["friends", friends_list |"followers", followers_list] | ...])
+        """
         # A dict of dict --> ["user_name_1", ["friends", friends_list | "followers", followers_list] | ...]
         edges = dict()
         # A Set of nodes (to avoid duplicated)
         nodes = set()
 
         # Get all the files from a path
-        files_list = [f for f in listdir(path) if isfile(join(path, f))]
+        files_list = [f for f in listdir(directory) if isfile(join(directory, f))]
 
         # for each file (user)
         for file_name in files_list:
@@ -28,7 +41,7 @@ class LoadPickleFriends:
                 # Check if extension is a ".picklefriends" file
                 if extension == "picklefriends":
                     # Load the dict for that user (friends and followers)
-                    friends_and_followers_dic = self.unpickle(join(path, file_name))
+                    friends_and_followers_dic = self.unpickle(join(directory, file_name))
                     user_friends = friends_and_followers_dic.get("friends")
                     user_followers = friends_and_followers_dic.get("followers")
 
@@ -46,6 +59,11 @@ class LoadPickleFriends:
     # Load an specific file - return a dictonary: ["friends", friends_list | "followers", followers_list]
     @staticmethod
     def unpickle(file_name):
+        """
+        Load a pickled file
+        :param file_name:
+        :return:
+        """
         with open(file_name, 'rb') as fo:
             friends_and_followers_dic = pickle.load(fo)
         return friends_and_followers_dic

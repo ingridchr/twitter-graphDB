@@ -9,6 +9,9 @@ import numpy as np
 
 
 def load_neo4jdb():
+    """
+    Loads a Neo4j GraphDB using the Neo4jGDBCreator class
+    """
     global config, graph_db
     # Load config.ini
     config = ConfigParser.ConfigParser()
@@ -18,6 +21,9 @@ def load_neo4jdb():
 
 
 def create_neo4j_graph_from_json():
+    """
+    Creates a Neo4j GraphDB from a JSON file
+    """
     x = LoadJSONFriends.LoadJSONFriends()
 
     # Load users from a directory
@@ -28,6 +34,10 @@ def create_neo4j_graph_from_json():
 
 
 def print_sna_metrics(g):
+    """
+    Prints some SNA metrics using the NetworkX library
+    :param g: ResultSet (cypher)
+    """
 
     print
     start_time = time.time()
