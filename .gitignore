@@ -1,0 +1,5 @@
+venv/
+config_local.ini
+dataset/
+*.pyc
+.idea/
